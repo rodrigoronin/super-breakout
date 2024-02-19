@@ -53,9 +53,9 @@ function draw(): void {
   y += dy;
   x += dx;
 
-  if (leftPressed) {
+  if (leftPressed && paddleX - paddleWidth / 2 > 0) {
     paddleX -= 5;
-  } else if (rightPressed) {
+  } else if (rightPressed && paddleX + paddleWidth / 2 < canvas.width) {
     paddleX += 5;
   }
 
