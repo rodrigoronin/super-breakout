@@ -1,8 +1,9 @@
 import './style.css'
 
-type Position = {
+type Bricks = {
   x: number,
   y: number,
+  destroyed: number,
 }
 
 // canvas definition
@@ -40,12 +41,13 @@ const brickPadding = 10;
 const brickOffsetTop = 30;
 const brickOffsetLeft = 30;
 
-const bricks: Position[][] = [];
+const bricks: Bricks[][] = [];
 
-for (let column = 0; column < brickColumnCount; column++) {
-  bricks[column] = [];
+for (let col = 0; col < brickColumnCount; col++) {
+  bricks[col] = [];
+
   for (let row = 0; row < brickRowCount; row++) {
-    bricks[column][row] = { x: 0, y: 0 };
+    bricks[col][row] = { x: 0, y: 0, destroyed: 0 };
   }
 }
 
@@ -86,18 +88,36 @@ function drawPaddle(): void {
 }
 
 function drawBricks(): void {
-  for (let column = 0; column < brickColumnCount; column++) {
+  for (let col = 0; col < brickColumnCount; col++) {
     for (let row = 0; row < brickRowCount; row++) {
-      const brickX: number = column * (brickWidth + brickPadding) + brickOffsetLeft;
-      const brickY: number = row * (brickHeight + brickPadding) + brickOffsetTop;
+      if (bricks[col][row].destroyed === 0) {
+        const brickX: number = col * (brickWidth + brickPadding) + brickOffsetLeft;
+        const brickY: number = row * (brickHeight + brickPadding) + brickOffsetTop;
 
-      bricks[column][row].x = brickX;
-      bricks[column][row].y = brickY;
-      ctx.beginPath();
-      ctx.rect(brickX, brickY, brickWidth, brickHeight);
-      ctx.fillStyle = ballColor;
-      ctx.fill();
-      ctx.closePath();
+        bricks[col][row].x = brickX;
+        bricks[col][row].y = brickY;
+        ctx.beginPath();
+        ctx.rect(brickX, brickY, brickWidth, brickHeight);
+        ctx.fillStyle = ballColor;
+        ctx.fill();
+        ctx.closePath();
+      }
+    }
+  }
+}
+
+function collisionDetection(): void {
+  for (let col = 0; col < brickColumnCount; col++) {
+    for (let row = 0; row < brickRowCount; row++) {
+      const brick = bricks[col][row];
+
+      if (brick.destroyed === 0) {
+
+        if (x > brick.x && x < brick.x + brickWidth && y > brick.y && y < brick.y + brickHeight) {
+          dy = -dy;
+          brick.destroyed = 1;
+        }
+      }
     }
   }
 }
@@ -107,6 +127,7 @@ function draw(): void {
 
   drawBall();
   drawPaddle();
+  collisionDetection();
   drawBricks();
 
   y += dy;
@@ -117,6 +138,7 @@ function draw(): void {
   } else if (rightPressed && paddleX < canvas.width - paddleWidth) {
     paddleX += paddleSpeed;
   }
+
 
   // change ballRadius for a 0 to give the illusion that the ball is soft
   if (x + dx < ballRadius || x + dx > canvas.width - ballRadius) {
@@ -140,8 +162,6 @@ function getRandomColor(): string {
   let r = Math.floor(Math.random() * 255) +1;
   let g = Math.floor(Math.random() * 255) +1;
   let b = Math.floor(Math.random() * 255) +1;
-
-  console.log(`rgb(${r},${g},${b})`);
 
   return `rgb(${r},${g},${b})`;
 }
