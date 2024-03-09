@@ -31,6 +31,7 @@ let rightPressed: boolean = false;
 
 let ballRadius: number = 10;
 let ballColor: string = 'lightblue';
+let ballIncrementalSpeed: number = 0;
 
 const brickRowCount = 3;
 const brickColumnCount = 5;
@@ -42,7 +43,8 @@ const brickOffsetLeft = 30;
 
 const bricks: Position[][] = [];
 
-for (let column = 0; column < brickColumnCount; column++) {
+// brick field initialization
+for (let column: number = 0; column < brickColumnCount; column++) {
   bricks[column] = [];
   for (let row = 0; row < brickRowCount; row++) {
     bricks[column][row] = { x: 0, y: 0 };
@@ -86,8 +88,8 @@ function drawPaddle(): void {
 }
 
 function drawBricks(): void {
-  for (let column = 0; column < brickColumnCount; column++) {
-    for (let row = 0; row < brickRowCount; row++) {
+  for (let column: number = 0; column < brickColumnCount; column++) {
+    for (let row: number = 0; row < brickRowCount; row++) {
       const brickX: number = column * (brickWidth + brickPadding) + brickOffsetLeft;
       const brickY: number = row * (brickHeight + brickPadding) + brickOffsetTop;
 
@@ -126,7 +128,8 @@ function draw(): void {
     dy = -dy;
   } else if (y + dy > canvas.height - ballRadius) {
     if (x > paddleX - (paddleWidth / 8) && x < (paddleX + paddleWidth) + paddleWidth / 8) {
-      dy = -dy;
+      dy = -(dy + ballIncrementalSpeed);
+      ballIncrementalSpeed += 0.05;
     } else {
       alert('Game Over');
       document.location.reload();
